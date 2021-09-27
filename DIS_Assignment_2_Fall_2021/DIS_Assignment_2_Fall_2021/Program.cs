@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DIS_Assignment_2_Fall_2021
 {
@@ -15,11 +16,12 @@ namespace DIS_Assignment_2_Fall_2021
             Console.WriteLine("Maximum altitude gained is {0}", max_height);
             Console.WriteLine();
 
+
             //Question 2:
             Console.WriteLine("Question 2:");
-            int[] nums = { 0, 1, 0, 3, 12 };
+            int[] nums = {  0, 1, 0, 3, 12 };
             Console.WriteLine("Enter the target number:");
-            int target = Int32.Parse(Console.ReadLine());
+            int target =Convert.ToInt32(Console.ReadLine());
             int pos = SearchInsert(nums, target);
             Console.WriteLine("Insert Position of the target is : {0}", pos);
             Console.WriteLine("");
@@ -109,22 +111,30 @@ namespace DIS_Assignment_2_Fall_2021
 
         /*
         Question 1:
-
         There is a biker going on a road trip. The road trip consists of n + 1 points at different altitudes. The biker starts his trip on point 0 with altitude equal 0.
         You are given an integer array gain of length n where gain[i] is the net gain in altitude between points i and i + 1  for all (0 <= i < n). Return the highest altitude of a point.
         Example 1:
         Input: gain = [-5,1,5,0,-7]
         Output: 1
         Explanation: The altitudes are [0,-5,-4,1,1,-6]. The highest is 1.
-
         */
 
         public static int LargestAltitude(int[] gain)
         {
             try
             {
-                //write your code here.
-                return 0;
+                //write your code here
+                int[] input = gain;
+                int k = gain.Length;
+                int[] altitude = new int[(k + 1)];
+                altitude[0] = 0;
+                for (int i=0;i<k; i++)
+                {
+                    altitude[i + 1] = gain[i] + altitude[i];
+                }
+                Array.Sort(altitude);
+                int y = altitude.Max();
+                return y; 
             }
             catch (Exception)
             {
@@ -136,38 +146,57 @@ namespace DIS_Assignment_2_Fall_2021
         /*
         
         Question 2:
-
         Given a sorted array of distinct integers and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.
         Note: The algorithm should have run time complexity of O (log n).
         Hint: Use binary search
-
         Example 1:
         Input: nums = [1,3,5,6], target = 5
         Output: 2
-
         Example 2:
         Input: nums = [1,3,5,6], target = 2
         Output: 1
-
         Example 3:
         Input: nums = [1,3,5,6], target = 7
         Output: 4
-
         */
+
+        static int binary(int[] nums, int start, int end, int target)
+        {
+
+
+            if (end >= start)
+            {
+                int mid = (end + start) / 2;
+
+                
+                if (nums[mid] == target)
+                    return mid;
+
+                
+                if (nums[mid] > target)
+                    return binary(nums, start, mid - 1, target);
+
+                return binary(nums, mid + 1, end, target);
+            }
+            else
+            {
+                return start;
+            }
+            
+        }
 
         public static int SearchInsert(int[] nums, int target)
         {
             try
             {
-                //Write your Code here.
-                return -1;
+                var v = binary(nums, 0, nums.Length-1, target);
+                return v;
             }
             catch (Exception)
             {
                 throw;
             }
         }
-
         /*
          
         Question 3
@@ -180,7 +209,6 @@ namespace DIS_Assignment_2_Fall_2021
         Example 2:
         Input: ["cool","lock","cook"]
         Output: ["c","o"]
-
         
         */
 
@@ -190,8 +218,61 @@ namespace DIS_Assignment_2_Fall_2021
             {
                 List<string> commonwords = new List<string>();
                 //write your code here.
+                Dictionary<char, int> dict = new Dictionary<char, int>();
+                foreach (char ce in words[0].ToArray())
+                {
+                    if (dict.ContainsKey(ce))
+                        dict[ce]++;
+                    else
+                    {
+                        dict.Add(ce, 1);
+                    }
+                }
+                for (int i = 1; i < words.Length; i++)
+                {
+                    Dictionary<char, int> temp_dict = new Dictionary<char, int>();
+                    char[] commonwords_ele = words[i].ToArray();
+                    foreach (char k in commonwords_ele)
+                    {
+                        if (temp_dict.ContainsKey(k))
+
+                            temp_dict[k]++;
+                        else
+                        {
+                            temp_dict.Add(k, 1);
+                        }
+                    }
+                    char[] dict_keys = dict.Keys.ToArray();
+                    foreach (char key in dict_keys)
+                    {
+                        if (temp_dict.ContainsKey(key))
+                        {
+
+                            dict[key] = Math.Min(dict[key], temp_dict[key]);
+                        }
+                        else
+                        {
+                            dict.Remove(key);
+                        }
+                    }
+                }
+                foreach (KeyValuePair<char, int> kvp in dict)
+                {
+                    for(int i =0; i< kvp.Value; i++)
+                    {
+                        commonwords.Add(kvp.Key.ToString());
+
+                    }
+                   
+                }
+
+                
 
                 return commonwords;
+
+
+
+
             }
             catch (Exception)
             {
@@ -202,18 +283,14 @@ namespace DIS_Assignment_2_Fall_2021
 
         /*
         Question 4:
-
         Given an array of integers arr, write a function that returns true if and only if the number of occurrences of each value in the array is unique.
-
         Example 1:
         Input: arr = [1,2,2,1,1,3]
         Output: true
         Explanation: The value 1 has 3 occurrences, 2 has 2 and 3 has 1. No two values have the same number of occurrences.
-
         Example 2:
         Input: arr = [1,2]
         Output: false
-
        
          */
 
@@ -221,8 +298,22 @@ namespace DIS_Assignment_2_Fall_2021
         {
             try
             {
-                //write your code here.
-                return false;
+                Dictionary<int, int> dict = new Dictionary<int, int>();
+                foreach (int d in arr)
+                {
+                    if (dict.ContainsKey(d))
+                        dict[d]++;
+                    else
+                        dict.Add(d, 1);
+                }
+               int[] value_array = dict.Values.ToArray();
+                if (value_array.Length == value_array.Distinct().Count())
+                {
+                   return false;
+                }
+
+                else
+                return true;
             }
             catch (Exception)
             {
@@ -235,35 +326,47 @@ namespace DIS_Assignment_2_Fall_2021
         /*
         
         Question 5:
-
         You are given an array items, where each items[i] = [type, color, name]  describes the type, color, and name of the ith item. You are also given a rule represented by two strings, ruleKey and ruleValue.
         The ith item is said to match the rule if one of the following is true:
         •	ruleKey == "type" and ruleValue == type.
         •	ruleKey == "color" and ruleValue == color.
         •	ruleKey == "name" and ruleValue == name.
-
         Return the number of items that match the given rule.
-
         Example 1:
         Input:  items = [["phone","blue","pixel"],["computer","silver","lenovo"],["phone","gold","iphone"]],  ruleKey = "color",  ruleValue = "silver".
         Output: 1
         Explanation: There is only one item matching the given rule, which is ["computer","silver","lenovo"].
-
         Example 2:
         Input: items = [["phone","blue","pixel"],["computer","silver","phone"],["phone","gold","iphone"]], ruleKey = "type",  ruleValue = "phone"
         Output: 2
         Explanation: There are only two items matching the given rule, which are ["phone","blue","pixel"]  and ["phone","gold","iphone"]. 
-
         Note that the item ["computer","silver","phone"] does not match.
-
         */
 
         public static int CountMatches(List<List<string>> items, string ruleKey, string ruleValue)
         {
             try
             {
-                //write your code here.
-                return 0;
+                int matches = 0;
+                int k =items.Count();
+                int col_no;
+
+                if (ruleKey == "type")
+                    col_no = 0; 
+                else if (ruleKey == "color")
+                    col_no = 1; 
+                else
+                    col_no = 2;
+                for (int j = 0; j < k; j++)
+                {
+                    List<string> item_ele = items.ElementAt(j);
+
+                    if (ruleValue == item_ele.ElementAt(col_no))
+                    {
+                        matches++;
+                    }
+                }
+                return matches;
             }
             catch (Exception)
             {
@@ -279,25 +382,19 @@ namespace DIS_Assignment_2_Fall_2021
         Given an array of integers numbers that is already sorted in non-decreasing order, find two numbers such that they add up to a specific target number.
         Print the indices of the two numbers (1-indexed) as an integer array answer of size 2, where 1 <= answer[0] < answer[1] <= numbers. Length.
         You may not use the same element twice, there will be only one solution for a given array.
-
         Note: Solve it in O(n) and O(1) space complexity.
-
         Hint: Use the fact that array is sorted in ascending order and there exists only one solution.
         Typically, in these cases it’s useful to use pointers tracking the two ends of the array.
-
         Example 1:
         Input: numbers = [2,7,11,15], target = 9
         Output: [1,2]
         Explanation: The sum of 2 and 7 is 9. Therefore index1 = 1, index2 = 2.
-
         Example 2:
         Input: numbers = [2,3,4], target = 6
         Output: [1,3]
-
         Example 3:
         Input: numbers = [-1,0], target = -1
         Output: [1,2]
-
         */
 
         public static void targetSum(int[] nums, int target)
@@ -306,6 +403,25 @@ namespace DIS_Assignment_2_Fall_2021
             {
                 //write your code here.
                 //print the answer in the function itself.
+                int ans1, ans2;
+                ans1 = 0;
+                ans2 = nums.Length - 1;
+
+                while (ans1 != ans2)
+                {
+                    int requiredAns2 = target - nums[ans1];
+
+                    while (requiredAns2 < nums[ans2])
+                    {
+                        ans2--;
+                    }
+                    if (nums[ans2] == requiredAns2) break;
+                    else ans1++;
+                }
+                
+
+                if (nums[ans1] + nums[ans2] == target)
+                    Console.WriteLine("[" + (ans1+1) + "," + (ans2+1) + "]");
 
             }
             catch (Exception)
@@ -318,23 +434,18 @@ namespace DIS_Assignment_2_Fall_2021
         /*
          
         Question 7:
-
         You are given a string allowed consisting of distinct characters and an array of strings words. A string is consistent if every character in words[i] appears in the string allowed.
         Return the number of consistent strings in the array words.
-
         Note: The algorithm should have run time complexity of O(n).
         Hint: Use Dictionaries. 
-
         Example 1:
         Input: allowed = "ab", words = ["ad","bd","aaab","baa","badab"]
         Output: 2
         Explanation: Strings "aaab" and "baa" are consistent since they only contain characters 'a' and 'b'. string “bd” is not consistent since ‘d’ is not in string allowed.
-
         Example 2:
         Input: allowed = "abc", words = ["a","b","c","ab","ac","bc","abc"]
         Output: 7
         Explanation: All strings are consistent.
-
         */
 
         public static int CountConsistentStrings(string allowed, string[] words)
@@ -342,7 +453,31 @@ namespace DIS_Assignment_2_Fall_2021
             try
             {
                 //write your code here.
-                return 0;
+                char[] ch = allowed.ToCharArray();
+                Dictionary<char, int> dict = new Dictionary<char, int>();
+                foreach( char c in ch)
+                {
+                    dict[c] = 1;
+                }
+                int cons_strings = 0;
+                foreach( string w in words)
+                {
+                    char[] word_arr = w.ToCharArray();
+                    bool consistent = true;
+                    foreach (char c in word_arr)
+                    {
+                        if(!dict.ContainsKey(c))
+                        {
+                            consistent = false;
+                            break;
+                        }
+                    }
+                    if (consistent == true)
+                    {
+                        cons_strings++;
+                    }
+                }
+                return cons_strings;
             }
             catch (Exception)
             {
@@ -353,18 +488,14 @@ namespace DIS_Assignment_2_Fall_2021
 
         /*
         Question 8:
-
         You are given two integer arrays nums1 and nums2 where nums2 is an anagram of nums1. Both arrays may contain duplicates.
-
         Return an index mapping array mapping from nums1 to nums2 where mapping[i] = j indicates that  the ith element in nums1 appears in nums2 at index j. If there are multiple answers, return any of them.
         An array a is an anagram of array b if b is made by randomizing the order of the elements in a.
-
  
         Example 1:
         Input: nums1 = [12,28,46,32,50], nums2 = [50,12,32,46,28]
         Output: [1,4,3,2,0]
         Explanation: As mapping[0] = 1 because the 0th element of nums1 appears at nums2[1], and mapping[1] = 4 because the 1st element of nums1 appears at nums2[4], and so on.
-
         */
 
         public static int[] AnagramMappings(int[] nums1, int[] nums2)
@@ -372,7 +503,20 @@ namespace DIS_Assignment_2_Fall_2021
             try
             {
                 //write your code here.
-                int[] ans = { };
+                int[] ans = new int[nums1.Length];
+                Dictionary<int, int> dict2 = new Dictionary<int, int>();
+                int nums2_Index = 0;
+                foreach( int n in nums2)
+                {
+                    dict2[n] = nums2_Index;
+                    nums2_Index++;
+                }
+                nums2_Index = 0;
+                foreach(int n in nums1)
+                {
+                    ans[nums2_Index]=dict2[n];
+                    nums2_Index++;
+                }
                 return ans;
             }
             catch (Exception)
@@ -383,9 +527,7 @@ namespace DIS_Assignment_2_Fall_2021
         /*
         
         Question 9:
-
         Given an integer array nums, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum.
-
         Note: Time Complexity should be O(n).
         Hint: Keep track of maximum sum as you move forward.
         Example 1:
@@ -395,7 +537,6 @@ namespace DIS_Assignment_2_Fall_2021
         Example 2:
         Input: nums = [1]
         Output: 1
-
         */
 
         public static int MaximumSum(int[] arr)
@@ -415,24 +556,16 @@ namespace DIS_Assignment_2_Fall_2021
         /*
          
         Question 10:
-
         Given an array of positive integers nums and a positive integer target, return the minimal length of a contiguous subarray [nums[l], nums[l+1], ..., nums[r-1], nums[r]] of which the sum is greater than or equal to target. If there is no such subarray, return 0 instead.
-
-
         Note: Try to solve it in O(n) time.
-
         Hint: Try to create a window and track the sum you have in the window.
-
         Example 1:
         Input: target = 7, nums = [2,3,1,2,4,3]
         Output: 2
         Explanation: The subarray [4,3] has the minimal length under the problem constraint.
-
-
         Example 2:
         Input: target = 4, nums = [1,4,4]
         Output: 1
-
         */
 
         public static int minSubArrayLen(int target_subarray_sum, int[] arr10)
